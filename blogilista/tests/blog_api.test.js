@@ -49,6 +49,27 @@ test('blogs have id field instead of _id', async () => {
   assert.strictEqual(hasUnderscoreId, false)
 })
 
+test('a valid blog can be added', async () => {
+  const newBlog = {
+    title: 'New Blog',
+    author: 'New Author',
+    url: 'http://example.com/new',
+    likes: 7
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const titles = response.body.map(blog => blog.title)
+
+  assert.strictEqual(response.body.length, initialBlogs.length + 1)
+  assert.ok(titles.includes('New Blog'))
+})
+
 after(() => {
   mongoose.connection.close()
 })
