@@ -39,6 +39,16 @@ test('all blogs are returned', async () => {
   assert.strictEqual(response.body.length, initialBlogs.length)
 })
 
+test('blogs have id field instead of _id', async () => {
+  const response = await api.get('/api/blogs')
+  const ids = response.body.map(blog => blog.id)
+  ids.forEach(id => {
+    assert.ok(id)
+  })
+  const hasUnderscoreId = response.body.some(blog => blog._id)
+  assert.strictEqual(hasUnderscoreId, false)
+})
+
 after(() => {
   mongoose.connection.close()
 })
