@@ -70,6 +70,21 @@ test('a valid blog can be added', async () => {
   assert.ok(titles.includes('New Blog'))
 })
 
+test('a blog can be deleted', async () => {
+  const responseAtStart = await api.get('/api/blogs')
+  const blogToDelete = responseAtStart.body[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const responseAtEnd = await api.get('/api/blogs')
+  assert.strictEqual(responseAtEnd.body.length, initialBlogs.length - 1)
+
+  const titles = responseAtEnd.body.map(blog => blog.title)
+  assert.ok(!titles.includes(blogToDelete.title))
+})
+
 after(() => {
   mongoose.connection.close()
 })
